@@ -108,7 +108,7 @@ def main():
         print(f"Missing required files/folders: {', '.join(missing_files)}")
         return
 
-    model_path = "olive_fly_model.cloudpkl"
+    model_path = "olive_fly_model_1.cloudpkl"
     
     if not os.path.exists(model_path):
         print(f"Model file not found: {model_path}")
