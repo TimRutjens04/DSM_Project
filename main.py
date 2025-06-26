@@ -14,9 +14,10 @@ MODEL_PATH = SCRIPT_DIR / "olive_fly_model.cloudpkl"
 # iterations = 1750 # Change this value to change training length
 # learning_rate = 0.00045
 # hidden_size = 256 # Pay attention to changing this value (64, 256) need to be tested
-iterations = 600 # Change this value to change training length
-learning_rate = 0.0007
+iterations = 1500 # Change this value to change training length
+learning_rate = 0.0006
 hidden_size = 256 # Pay attention to changing this value (64, 256) need to be tested
+batch_size = 256
 ###############################################
 
 
@@ -145,7 +146,7 @@ def weighted_back_prop(Z1, A1, Z2, A2, W2, X, Y):
     m = Y.size
     one_hot_Y = one_hot(Y)
 
-    class_0_weight = 0.3  # Not olive fly
+    class_0_weight = 0.5  # Not olive fly
     class_1_weight = 3.0  # Olive fly 
     
     # Apply weights to loss
@@ -192,7 +193,8 @@ def get_accuracy(predictions, Y):
 #             print(f"Accuracy: {get_accuracy(get_predictions((A2)), Y)}")
 #     return W1, b1, W2, b2
 
-def gradient_descent(X, Y, iterations, alpha, batch_size=256):
+def gradient_descent(X, Y, iterations, alpha):
+    global batch_size
     W1, b1, W2, b2 = init_params()
     m = X.shape[1]
     
@@ -207,7 +209,7 @@ def gradient_descent(X, Y, iterations, alpha, batch_size=256):
             dW1, db1, dW2, db2 = weighted_back_prop(Z1, A1, Z2, A2, W2, X_batch, Y_batch) 
             W1, b1, W2, b2 = update_params(W1, b1, W2, b2, dW1, db1, dW2, db2, alpha)
         
-        if i % 25 == 0:
+        if i % 50 == 0:
             Z1, A1, Z2, A2 = forward_prop(W1, b1, W2, b2, X, training=False)  
             print(f"Iteration: {i}")
             print(f"Accuracy: {get_accuracy(get_predictions(A2), Y)}")
@@ -245,8 +247,10 @@ if __name__ == "__main__":
     val_accuracy = get_accuracy(val_predictions, Y_val)
     print(f"Validation accuracy: {val_accuracy}")
     end_time = time.time()
-    total_time_hrs = (end_time - start_time) // 60
-    print(f"Total time: {end_time - start_time}")
+    total_time_seconds = end_time - start_time
+    total_time_hrs = total_time_seconds / 3600  # Convert seconds to hours
+    total_time_mins = (total_time_seconds % 3600) / 60  # Remaining minutes
+    print(f"Total time: {total_time_hrs:.2f} hours ({total_time_mins:.1f} minutes)")
 
     model = OliveFlyModel(W1, b1, W2, b2, class_mapping)
 
